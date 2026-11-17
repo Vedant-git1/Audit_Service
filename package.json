@@ -1,0 +1,62 @@
+{
+  "name": "resolve-audit-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Resolve Audit Service foundation",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --runInBand",
+    "test:integration": "jest tests/integration --runInBand",
+    "test:watch": "jest --watch",
+    "validate:env": "tsx scripts/validate-env.ts",
+    "events:one-each": "tsx scripts/dummy-events/producer.ts all",
+    "events:10": "tsx scripts/dummy-events/producer.ts batch --count 10",
+    "events:100": "tsx scripts/dummy-events/producer.ts batch --count 100",
+    "events:type": "tsx scripts/dummy-events/producer.ts type",
+    "events:duplicates": "tsx scripts/dummy-events/producer.ts duplicates",
+    "events:invalid-json": "tsx scripts/dummy-events/producer.ts invalid-json",
+    "events:invalid-envelope": "tsx scripts/dummy-events/producer.ts invalid-envelope",
+    "events:unsupported-version": "tsx scripts/dummy-events/producer.ts unsupported-version",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "ioredis": "^5.11.1",
+    "jose": "^5.10.0",
+    "kafkajs": "^2.2.4",
+    "pino": "^9.4.0",
+    "pino-http": "^10.3.0",
+    "prisma": "^5.22.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.12.0",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.7.4",
+    "@types/supertest": "^6.0.2",
+    "eslint": "^9.12.0",
+    "eslint-config-prettier": "^9.1.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.3",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.8.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "ISC"
+}

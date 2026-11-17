@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AuditLog {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId      String   @unique(map: "audit_logs_event_id_key") @map("event_id") @db.Uuid
+  tenantId     String   @map("tenant_id") @db.Uuid
+  actorId      String?  @map("actor_id") @db.Uuid
+  action       String   @db.VarChar(100)
+  eventVersion Int      @map("event_version")
+  resourceType String   @map("resource_type") @db.VarChar(50)
+  resourceId   String   @map("resource_id") @db.Uuid
+  timestamp    DateTime @db.Timestamptz(6)
+  payload      Json     @db.JsonB
+  oldValue     Json?    @map("old_value") @db.JsonB
+  newValue     Json?    @map("new_value") @db.JsonB
+  requestId    String?  @map("request_id") @db.VarChar(100)
+  traceId      String?  @map("trace_id") @db.VarChar(100)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([tenantId, timestamp], map: "audit_logs_tenant_event_timestamp_idx")
+  @@index([resourceType, resourceId, timestamp], map: "audit_logs_resource_event_timestamp_idx")
+  @@index([actorId, timestamp], map: "audit_logs_actor_event_timestamp_idx")
+  @@index([timestamp], map: "audit_logs_event_timestamp_idx")
+  @@map("audit_logs")
+}
+
+model AuditEventProcessing {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId          String?   @map("event_id") @db.Uuid
+  topic            String    @db.VarChar(255)
+  partition        Int
+  offset           BigInt
+  processingStatus String    @map("processing_status") @db.VarChar(20)
+  attemptCount     Int       @default(1) @map("attempt_count")
+  errorMessage     String?   @map("error_message") @db.Text
+  rawMessage       Bytes?    @map("raw_message") @db.ByteA
+  kafkaHeaders     Json?     @map("kafka_headers") @db.JsonB
+  processedAt      DateTime? @map("processed_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([topic, partition, offset], map: "audit_event_processing_kafka_coordinates_key")
+  @@index([eventId], map: "audit_event_processing_event_id_idx")
+  @@index([processingStatus, createdAt], map: "audit_event_processing_status_created_at_idx")
+  @@map("audit_event_processing")
+}
